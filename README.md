@@ -28,8 +28,8 @@
 
 ### セキュリティ
 - **生体認証ロック** — アプリ起動時に Face ID / 指紋認証を要求。認証に失敗するとデータにアクセスできない
-- **暗号化ストレージ** — 全データを [expo-secure-store](https://docs.expo.dev/versions/latest/sdk/securestore/) で暗号化保存。iOS は Keychain、Android は Keystore を使用
-- **完全ローカル動作** — データはスマートフォン内にのみ保存。クラウド送信なし・アカウント登録不要・インターネット接続不要
+- **暗号化ストレージ** — 全データを [expo-secure-store](https://docs.expo.dev/versions/latest/sdk/securestore/) で暗号化保存。iOS は AES-256（Secure Enclave）、Android は AES-256-GCM（Keystore）を使用
+- **データはローカルのみ** — 健康データはクラウドに送信されない。アカウント登録不要
 
 ---
 
@@ -40,8 +40,10 @@
 | 機能 | 実装 | 効果 |
 |------|------|------|
 | **生体認証ロック** | expo-local-authentication（Face ID / 指紋認証） | アプリ起動時に本人確認。他人がスマホを操作してもデータを見られない |
-| **暗号化ストレージ** | expo-secure-store（iOS Keychain / Android Keystore） | 全記録データをOSレベルで暗号化。ストレージを直接読んでもデータを解読できない |
-| **完全ローカル動作** | ネットワーク通信なし | データはスマートフォン内にのみ存在。クラウド漏洩リスクゼロ・アカウント登録不要 |
+| **暗号化ストレージ** | expo-secure-store → iOS: AES-256（Secure Enclave）/ Android: AES-256-GCM（Keystore） | 全記録データをOSレベルで暗号化。ファイルを直接読んでもデータを解読できない |
+| **データはローカルのみ** | アプリコード内にネットワーク通信なし | 健康データはクラウドに送信されない。アカウント登録不要 |
+
+> **補足**: Expo frameworkのOTAアップデート確認など、フレームワークレベルの通信は発生する場合があります。アプリが収集した健康データがネットワークに送信されることはありません。
 
 ---
 
