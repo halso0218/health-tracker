@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { useFocusEffect, router } from 'expo-router';
 import { getAllRecords, getRecord } from '../../src/storage/records';
 import { getCategories } from '../../src/storage/categories';
 import { Category, ConditionRecord } from '../../src/types';
@@ -85,6 +85,11 @@ export default function HomeScreen() {
           <Text style={styles.statLabel}>分析ステータス</Text>
         </View>
       </View>
+
+      {/* データ管理 */}
+      <TouchableOpacity style={styles.manageBtn} onPress={() => router.push('/data-management')}>
+        <Text style={styles.manageBtnText}>データを管理 ›</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -113,4 +118,6 @@ const styles = StyleSheet.create({
   },
   statNum: { fontSize: 20, fontWeight: '700', color: '#2563eb' },
   statLabel: { fontSize: 12, color: '#6b7280', marginTop: 4 },
+  manageBtn: { alignSelf: 'center', paddingVertical: 8 },
+  manageBtnText: { color: '#6b7280', fontSize: 13 },
 });

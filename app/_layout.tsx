@@ -40,6 +40,10 @@ export default function RootLayout() {
         name="category-edit"
         options={{ title: 'カテゴリ管理', presentation: 'modal' }}
       />
+      <Stack.Screen
+        name="data-management"
+        options={{ title: 'データ管理', presentation: 'modal' }}
+      />
     </Stack>
   );
 }
