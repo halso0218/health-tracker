@@ -34,8 +34,12 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.dateText}>{TODAY}</Text>
-      <Text style={styles.heading}>今日のサマリー</Text>
+
+      {/* ヘッダー */}
+      <View style={styles.header}>
+        <Text style={styles.dateText}>{TODAY}</Text>
+        <Text style={styles.heading}>今日のサマリー</Text>
+      </View>
 
       {/* 最新体調 */}
       <View style={styles.card}>
@@ -73,16 +77,19 @@ export default function HomeScreen() {
       </View>
 
       {/* 統計 */}
-      <View style={styles.statsRow}>
-        <View style={styles.statBox}>
-          <Text style={styles.statNum}>{totalCount}</Text>
-          <Text style={styles.statLabel}>記録日数</Text>
-        </View>
-        <View style={styles.statBox}>
-          <Text style={styles.statNum}>
-            {totalCount >= 5 ? '分析可能' : `あと${5 - totalCount}日`}
-          </Text>
-          <Text style={styles.statLabel}>分析ステータス</Text>
+      <View style={styles.statsCard}>
+        <View style={styles.statsRow}>
+          <View style={styles.statBox}>
+            <Text style={styles.statNum}>{totalCount}</Text>
+            <Text style={styles.statLabel}>記録日数</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statNum}>
+              {totalCount >= 5 ? '分析可能' : `あと${5 - totalCount}日`}
+            </Text>
+            <Text style={styles.statLabel}>分析ステータス</Text>
+          </View>
         </View>
       </View>
 
@@ -90,34 +97,45 @@ export default function HomeScreen() {
       <TouchableOpacity style={styles.manageBtn} onPress={() => router.push('/data-management')}>
         <Text style={styles.manageBtnText}>データを管理 ›</Text>
       </TouchableOpacity>
+
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f9fafb' },
-  content: { padding: 16, gap: 14, paddingBottom: 40 },
-  dateText: { color: '#6b7280', fontSize: 13 },
-  heading: { fontSize: 22, fontWeight: '700', color: '#111827' },
+  content: { padding: 16, gap: 16, paddingBottom: 40 },
+
+  header: { gap: 2 },
+  dateText: { fontSize: 12, color: '#9ca3af', marginBottom: 2 },
+  heading: { fontSize: 24, fontWeight: '800', color: '#111827', letterSpacing: -0.5 },
+
   card: {
     backgroundColor: '#ffffff', borderRadius: 12, padding: 16, gap: 6,
+    minHeight: 90,
     shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, elevation: 2,
   },
-  cardLabel: { fontSize: 12, fontWeight: '600', color: '#6b7280', marginBottom: 2 },
+  cardLabel: { fontSize: 11, fontWeight: '700', color: '#9ca3af', letterSpacing: 0.5, marginBottom: 2 },
   scoreText: { fontSize: 26, fontWeight: '700', color: '#111827' },
   slotText: { fontSize: 12, color: '#9ca3af' },
   sub: { fontSize: 13, color: '#374151' },
   empty: { fontSize: 14, color: '#9ca3af' },
+
   entryRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   entrySlot: { fontSize: 12, color: '#2563eb', fontWeight: '600', width: 36 },
   entryCat: { fontSize: 12, color: '#6b7280', width: 60 },
   entryVal: { fontSize: 14, color: '#111827', flex: 1 },
-  statsRow: { flexDirection: 'row', gap: 12 },
-  statBox: {
-    flex: 1, backgroundColor: '#eff6ff', borderRadius: 12, padding: 16, alignItems: 'center',
+
+  statsCard: { backgroundColor: '#eff6ff', borderRadius: 12, padding: 16 },
+  statsRow: { flexDirection: 'row', alignItems: 'center' },
+  statBox: { flex: 1, alignItems: 'center' },
+  statDivider: { width: 1, height: 36, backgroundColor: '#bfdbfe' },
+  statNum: { fontSize: 22, fontWeight: '800', color: '#2563eb' },
+  statLabel: { fontSize: 11, color: '#6b7280', marginTop: 4, letterSpacing: 0.3 },
+
+  manageBtn: {
+    borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10,
+    paddingVertical: 12, alignItems: 'center', backgroundColor: '#ffffff',
   },
-  statNum: { fontSize: 20, fontWeight: '700', color: '#2563eb' },
-  statLabel: { fontSize: 12, color: '#6b7280', marginTop: 4 },
-  manageBtn: { alignSelf: 'center', paddingVertical: 8 },
-  manageBtnText: { color: '#6b7280', fontSize: 13 },
+  manageBtnText: { color: '#6b7280', fontSize: 13, fontWeight: '600' },
 });
