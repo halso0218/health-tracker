@@ -21,7 +21,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ],
+      "package": "com.halso.healthtracker"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -31,6 +36,12 @@
       "expo-router",
       "expo-local-authentication"
     ],
-    "scheme": "health-tracker"
+    "scheme": "health-tracker",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b7e5b58c-0f71-4429-9795-51bd4e8677cb"
+      }
+    }
   }
 }
