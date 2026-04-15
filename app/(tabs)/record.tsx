@@ -3,6 +3,7 @@ import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
   StyleSheet, Alert, Modal, KeyboardAvoidingView, Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, router } from 'expo-router';
 import { getOrCreateRecord, saveRecord } from '../../src/storage/records';
 import { getCategories } from '../../src/storage/categories';
@@ -13,6 +14,7 @@ import OptionPicker from '../../src/components/OptionPicker';
 const TODAY = new Date().toISOString().split('T')[0];
 
 export default function RecordScreen() {
+  const insets = useSafeAreaInsets();
   const [date, setDate] = useState(TODAY);
   const [record, setRecord] = useState<ConditionRecord>({ date, conditions: [], entries: [] });
   const [categories, setCategories] = useState<Category[]>([]);
@@ -105,19 +107,17 @@ export default function RecordScreen() {
         <DateNavigator date={date} onChange={d => { setDate(d); loadAll(d); }} />
 
         {/* カテゴリ別クイック追加ボタン */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={styles.quickRow}>
-            {categories.map(cat => (
-              <TouchableOpacity
-                key={cat.id}
-                style={styles.quickBtn}
-                onPress={() => openAdd(cat.id)}
-              >
-                <Text style={styles.quickBtnText}>＋ {cat.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </ScrollView>
+        <View style={styles.quickRow}>
+          {categories.map(cat => (
+            <TouchableOpacity
+              key={cat.id}
+              style={styles.quickBtn}
+              onPress={() => openAdd(cat.id)}
+            >
+              <Text style={styles.quickBtnText}>＋ {cat.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
         {/* 記録一覧 */}
         {record.entries.length === 0 ? (
@@ -157,7 +157,7 @@ export default function RecordScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           <View style={styles.modalOverlay}>
-            <View style={styles.modalCard}>
+            <View style={[styles.modalCard, { paddingBottom: 20 + insets.bottom }]}>
               <Text style={styles.modalTitle}>
                 {editIndex !== null ? '記録を編集' : '記録を追加'}
               </Text>
@@ -235,7 +235,7 @@ export default function RecordScreen() {
 
 const styles = StyleSheet.create({
   content: { padding: 16, gap: 12, paddingBottom: 40 },
-  quickRow: { flexDirection: 'row', gap: 8, paddingVertical: 4 },
+  quickRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingVertical: 4 },
   quickBtn: {
     paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
     backgroundColor: '#2563eb',

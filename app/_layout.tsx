@@ -44,6 +44,10 @@ export default function RootLayout() {
         name="data-management"
         options={{ title: 'データ管理', presentation: 'modal' }}
       />
+      <Stack.Screen
+        name="symptom-edit"
+        options={{ title: '症状の管理', presentation: 'modal' }}
+      />
     </Stack>
   );
 }

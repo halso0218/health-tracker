@@ -3,8 +3,10 @@ import {
   View, Text, ScrollView, TouchableOpacity,
   TextInput, StyleSheet, Alert, Modal, KeyboardAvoidingView, Platform,
 } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect, router } from 'expo-router';
 import { getOrCreateRecord, saveRecord } from '../../src/storage/records';
+import { getSymptoms } from '../../src/storage/symptoms';
 import { ConditionEntry, ConditionRecord, TIME_SLOTS, TimeSlot } from '../../src/types';
 import DateNavigator from '../../src/components/DateNavigator';
 
@@ -18,17 +20,11 @@ const SCORE_OPTIONS = [
   { value: 5 as const, label: '😄', desc: '最高' },
 ];
 
-const SYMPTOM_OPTIONS = ['頭痛', '倦怠感', '腹痛', '不眠', 'むくみ', '肩こり', '食欲不振', '気分の落ち込み'];
-
-const EMPTY_ENTRY: Omit<ConditionEntry, 'timeSlot'> = {
-  score: 3,
-  symptoms: [],
-  note: '',
-};
-
 export default function ConditionScreen() {
+  const insets = useSafeAreaInsets();
   const [date, setDate] = useState(TODAY);
   const [record, setRecord] = useState<ConditionRecord>({ date, conditions: [], entries: [] });
+  const [symptomOptions, setSymptomOptions] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
 
@@ -38,7 +34,10 @@ export default function ConditionScreen() {
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [note, setNote] = useState('');
 
-  useFocusEffect(useCallback(() => { loadRecord(date); }, [date]));
+  useFocusEffect(useCallback(() => {
+    loadRecord(date);
+    getSymptoms().then(setSymptomOptions);
+  }, [date]));
 
   async function loadRecord(d: string) {
     const r = await getOrCreateRecord(d);
@@ -135,6 +134,10 @@ export default function ConditionScreen() {
         <TouchableOpacity style={styles.addBtn} onPress={openAdd}>
           <Text style={styles.addBtnText}>＋ 体調を追加</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={styles.manageBtn} onPress={() => router.push('/symptom-edit')}>
+          <Text style={styles.manageBtnText}>症状を管理 ›</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       {/* 入力モーダル */}
@@ -144,7 +147,7 @@ export default function ConditionScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           <View style={styles.modalOverlay}>
-            <View style={styles.modalCard}>
+            <View style={[styles.modalCard, { paddingBottom: 20 + insets.bottom }]}>
               <Text style={styles.modalTitle}>
                 {editIndex !== null ? '体調を編集' : '体調を追加'}
               </Text>
@@ -187,7 +190,7 @@ export default function ConditionScreen() {
               {/* 症状 */}
               <Text style={styles.label}>症状</Text>
               <View style={styles.chipRow}>
-                {SYMPTOM_OPTIONS.map(s => (
+                {symptomOptions.map(s => (
                   <TouchableOpacity
                     key={s}
                     style={[styles.chip, symptoms.includes(s) && styles.chipActive]}
@@ -251,6 +254,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563eb', borderRadius: 12, padding: 14, alignItems: 'center',
   },
   addBtnText: { color: '#ffffff', fontSize: 15, fontWeight: '700' },
+  manageBtn: { alignSelf: 'center', paddingVertical: 8 },
+  manageBtnText: { color: '#6b7280', fontSize: 13 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalCard: {
     backgroundColor: '#ffffff', borderTopLeftRadius: 20, borderTopRightRadius: 20,

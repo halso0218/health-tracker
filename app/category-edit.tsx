@@ -3,6 +3,7 @@ import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
   StyleSheet, Alert, Modal,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   getCategories, saveCategories, addCategory, deleteCategory, generateId,
 } from '../src/storage/categories';
@@ -10,6 +11,7 @@ import { getAllRecords } from '../src/storage/records';
 import { Category, CategoryInputType } from '../src/types';
 
 export default function CategoryEditScreen() {
+  const insets = useSafeAreaInsets();
   const [categories, setCategories] = useState<Category[]>([]);
   // カテゴリIDごとの記録件数
   const [entryCounts, setEntryCounts] = useState<Record<string, number>>({});
@@ -86,6 +88,15 @@ export default function CategoryEditScreen() {
     setModalVisible(false);
   }
 
+  function moveCategory(index: number, dir: 'up' | 'down') {
+    const next = [...categories];
+    const swap = dir === 'up' ? index - 1 : index + 1;
+    if (swap < 0 || swap >= next.length) return;
+    [next[index], next[swap]] = [next[swap], next[index]];
+    setCategories(next);
+    saveCategories(next);
+  }
+
   async function handleDelete(cat: Category) {
     const count = entryCounts[cat.id] ?? 0;
     const isDefault = cat.isDefault ?? false;
@@ -147,10 +158,28 @@ export default function CategoryEditScreen() {
           </Text>
         </View>
 
-        {categories.map(cat => {
+        {categories.map((cat, index) => {
           const count = entryCounts[cat.id] ?? 0;
           return (
             <View key={cat.id} style={styles.catCard}>
+              {/* 並び替えボタン */}
+              <View style={styles.arrows}>
+                <TouchableOpacity
+                  onPress={() => moveCategory(index, 'up')}
+                  disabled={index === 0}
+                  style={[styles.arrowBtn, index === 0 && styles.arrowDisabled]}
+                >
+                  <Text style={styles.arrowText}>↑</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => moveCategory(index, 'down')}
+                  disabled={index === categories.length - 1}
+                  style={[styles.arrowBtn, index === categories.length - 1 && styles.arrowDisabled]}
+                >
+                  <Text style={styles.arrowText}>↓</Text>
+                </TouchableOpacity>
+              </View>
+
               <View style={styles.catInfo}>
                 <View style={styles.catNameRow}>
                   <Text style={styles.catName}>{cat.name}</Text>
@@ -185,7 +214,7 @@ export default function CategoryEditScreen() {
       {/* 追加・編集モーダル */}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
+          <View style={[styles.modalCard, { paddingBottom: 20 + insets.bottom }]}>
             <Text style={styles.modalTitle}>
               {editTarget ? 'カテゴリを編集' : 'カテゴリを追加'}
             </Text>
@@ -259,9 +288,16 @@ const styles = StyleSheet.create({
   infoText: { fontSize: 13, color: '#0369a1', lineHeight: 18 },
   catCard: {
     backgroundColor: '#ffffff', borderRadius: 12, padding: 14,
-    flexDirection: 'row', alignItems: 'center',
+    flexDirection: 'row', alignItems: 'center', gap: 8,
     shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 1,
   },
+  arrows: { flexDirection: 'column', gap: 4 },
+  arrowBtn: {
+    width: 28, height: 28, borderRadius: 7,
+    backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center',
+  },
+  arrowDisabled: { opacity: 0.3 },
+  arrowText: { fontSize: 13, color: '#374151' },
   catInfo: { flex: 1, gap: 4 },
   catNameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   catName: { fontSize: 15, fontWeight: '600', color: '#111827' },
